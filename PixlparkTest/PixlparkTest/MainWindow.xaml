@@ -1,0 +1,75 @@
+﻿<Window x:Class="PixlparkTest.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModel="clr-namespace:PixlparkTest.ViewModel"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:command="http://www.galasoft.ch/mvvmlight"
+        mc:Ignorable="d"
+        Title="Заказы" Height="600" Width="1024" >
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="Margin" Value="5,2,5,2"/>
+        </Style>
+        <viewModel:MainViewModel x:Key="MainViewModel"/>
+    </Window.Resources>
+    <Window.DataContext>
+        <Binding Source="{StaticResource MainViewModel}"/>
+    </Window.DataContext>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <ListBox x:Name="OrderListBox" Grid.Column="0" Margin="5" ItemsSource="{Binding Orders}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Title}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName= "SelectionChanged">
+                    <command:EventToCommand 
+                                        Command="{Binding SelectedOrderChangedCommand}"
+                                        CommandParameter="{Binding SelectedItem, ElementName=OrderListBox}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+
+        </ListBox>
+        <ScrollViewer Grid.Column="1">
+            <StackPanel Margin="5" Visibility="{Binding Path=SelectedOrder.Title, Converter={StaticResource NullToVisibilityConverter}}">
+                <TextBlock Text="{Binding SelectedOrder.Title}" TextWrapping="Wrap" FontSize="16"/>
+                <StackPanel Orientation="Horizontal"  Visibility="{Binding Path=SelectedOrder.Price, Converter={StaticResource NullToVisibilityConverter}}">
+                    <TextBlock Text="Цена:"/>
+                    <TextBlock Text="{Binding SelectedOrder.Price}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal"  Visibility="{Binding Path=SelectedOrder.TotalPrice, Converter={StaticResource NullToVisibilityConverter}}">
+                    <TextBlock Text="Цена (с учетом доставки):"/>
+                    <TextBlock Text="{Binding SelectedOrder.TotalPrice}"/>
+                </StackPanel>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Адрес доставки:"/>
+                    <StackPanel Grid.Column="1" Orientation="Vertical">
+                        <TextBlock Text="{Binding SelectedOrder.DeliveryAddress.Country}" Visibility="{Binding Path=SelectedOrder.DeliveryAddress.Country, Converter={StaticResource NullToVisibilityConverter}}"/>
+                        <TextBlock Text="{Binding SelectedOrder.DeliveryAddress.City}" Visibility="{Binding Path=SelectedOrder.DeliveryAddress.City, Converter={StaticResource NullToVisibilityConverter}}"/>
+                        <TextBlock Text="{Binding SelectedOrder.DeliveryAddress.AddressLine1}" Visibility="{Binding Path=SelectedOrder.DeliveryAddress.AddressLine1, Converter={StaticResource NullToVisibilityConverter}}"/>
+                        <TextBlock Text="{Binding SelectedOrder.DeliveryAddress.FullName}" Visibility="{Binding Path=SelectedOrder.DeliveryAddress.FullName, Converter={StaticResource NullToVisibilityConverter}}"/>
+                        <StackPanel Orientation="Horizontal"  Visibility="{Binding Path=SelectedOrder.DeliveryAddress.Phone, Converter={StaticResource NullToVisibilityConverter}}">
+                            <TextBlock Text="тел."/>
+                            <TextBlock Text="{Binding SelectedOrder.DeliveryAddress.Phone}"/>
+                        </StackPanel>
+                       
+                    </StackPanel>
+
+                </Grid>
+                <Image Margin="20" Source="{Binding SelectedOrder.PreviewImage}"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>
